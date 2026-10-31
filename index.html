@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>选品雷达 · 在线界面导览</title>
+<meta name="description" content="选品雷达 — AI 市场情报平台，桌面版真实界面在线导览">
+<link rel="icon" href="assets/app.png">
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --border: #f0f1f3;
+    --border-strong: #e5e7eb;
+    --text: #17181a;
+    --text-2: #6b7280;
+    --text-3: #9ca3af;
+    --primary: #17181a;
+    --ok: #16a34a;
+    --pastel-indigo: #eef0ff;
+    --pastel-green: #e7f8f0;
+    --pastel-amber: #fef6e0;
+    --pastel-rose: #feecec;
+    --pastel-blue: #e8f2fe;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Microsoft YaHei UI", "Microsoft YaHei", -apple-system,
+                 BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── 顶栏 ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 22px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: var(--primary);
+    display: grid; place-items: center;
+    flex: 0 0 auto;
+  }
+  .logo svg { display: block; }
+  .brand-title { font-size: 17px; font-weight: 700; line-height: 1.2; }
+  .brand-sub { font-size: 11.5px; color: var(--text-3); letter-spacing: .3px; }
+  .grow { flex: 1 1 auto; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600;
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--pastel-amber); color: #b45309;
+    border: 1px solid #fde68a;
+  }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; }
+
+  /* ── 布局 ── */
+  .shell { display: flex; align-items: flex-start; min-height: calc(100vh - 61px); }
+
+  .sidebar {
+    width: 232px; flex: 0 0 232px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 12px 10px 24px;
+    position: sticky; top: 61px;
+    align-self: flex-start;
+    max-height: calc(100vh - 61px);
+    overflow-y: auto;
+  }
+  .side-label {
+    font-size: 11px; font-weight: 600; color: var(--text-3);
+    letter-spacing: .6px; padding: 12px 12px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px; margin: 1px 0;
+    border-radius: 10px; cursor: pointer;
+    font-size: 13px; color: #4b5563;
+    border: none; background: none; width: 100%; text-align: left;
+    font-family: inherit; transition: background .12s ease;
+  }
+  .nav-item:hover { background: #f5f6f8; }
+  .nav-item.active { background: #f0f1f3; color: #111214; font-weight: 600; }
+  .nav-ico {
+    width: 22px; height: 22px; border-radius: 7px;
+    display: grid; place-items: center; font-size: 12px;
+    background: #f5f6f8; flex: 0 0 auto;
+  }
+  .nav-item.active .nav-ico { background: #fff; }
+
+  .content { flex: 1 1 auto; padding: 22px 26px 40px; min-width: 0; }
+
+  .page-head { margin-bottom: 16px; }
+  .page-title { font-size: 28px; font-weight: 700; letter-spacing: -.2px; margin: 0; }
+  .page-caption { font-size: 13.5px; color: var(--text-2); margin-top: 4px; }
+
+  .shot-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 10px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+  }
+  .shot-wrap img {
+    display: block; width: 100%; height: auto;
+    border-radius: 11px; border: 1px solid var(--border);
+  }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 6px; }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px 18px;
+  }
+  .kpi .tile {
+    width: 34px; height: 34px; border-radius: 10px; margin-bottom: 12px;
+    display: grid; place-items: center;
+  }
+  .kpi .tile i { width: 14px; height: 14px; border-radius: 50%; display: block; }
+  .kpi .label { font-size: 12.5px; color: var(--text-2); }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+
+  .note {
+    margin-top: 18px; padding: 16px 18px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; font-size: 13px; color: var(--text-2);
+    line-height: 1.75;
+  }
+  .note b { color: var(--text); }
+  .note code {
+    background: #f5f6f8; padding: 1px 6px; border-radius: 5px;
+    font-size: 12px; color: #374151;
+  }
+
+  footer {
+    padding: 22px 26px 34px; font-size: 12px; color: var(--text-3);
+    border-top: 1px solid var(--border); margin-top: 10px;
+  }
+
+  /* ── 窄屏 ── */
+  @media (max-width: 900px) {
+    .shell { display: block; }
+    .sidebar {
+      position: static; width: auto; max-height: none;
+      border-right: none; border-bottom: 1px solid var(--border);
+      display: flex; gap: 6px; overflow-x: auto; padding: 10px 12px;
+    }
+    .side-label { display: none; }
+    .nav-item { width: auto; white-space: nowrap; }
+    .nav-item span.txt { display: inline; }
+    .content { padding: 16px 14px 28px; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .page-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="13" width="3.4" height="8" rx="1.2" fill="#fff"/>
+      <rect x="10.3" y="9" width="3.4" height="12" rx="1.2" fill="#fff"/>
+      <rect x="17.6" y="4" width="3.4" height="17" rx="1.2" fill="#fff"/>
+    </svg>
+  </div>
+  <div>
+    <div class="brand-title">选品雷达</div>
+    <div class="brand-sub">AI Market Intelligence</div>
+  </div>
+  <div class="grow"></div>
+  <span class="chip"><span class="dot"></span>在线界面导览 · 真实截图</span>
+</header>
+
+<div class="shell">
+  <nav class="sidebar" id="nav" aria-label="页面导航">
+    <div class="side-label">功能导航</div>
+  </nav>
+
+  <main class="content">
+    <div class="page-head">
+      <h1 class="page-title" id="title">市场总览</h1>
+      <div class="page-caption" id="caption"></div>
+    </div>
+
+    <div class="shot-wrap">
+      <img id="shot" alt="界面截图" loading="eager">
+    </div>
+
+    <div class="kpis">
+      <div class="kpi">
+        <div class="tile" style="background:var(--pastel-rose)"><i style="background:#ef4444"></i></div>
+        <div class="label">痛点聚类</div>
+        <div class="value">5 项</div>
+      </div>
+      <div class="kpi">
+        <div class="tile" style="background:var(--pastel-indigo)"><i style="background:#6366f1"></i></div>
+        <div class="label">蓝海机会</div>
+        <div class="value">5 个</div>
+      </div>
+      <div class="kpi">
+        <div class="tile" style="background:var(--pastel-amber)"><i style="background:#f59e0b"></i></div>
+        <div class="label">最高评分</div>
+        <div class="value">85 / 100</div>
+      </div>
+      <div class="kpi">
+        <div class="tile" style="background:var(--pastel-green)"><i style="background:#10b981"></i></div>
+        <div class="label">跟踪竞品</div>
+        <div class="value">5 个</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>说明：</b>选品雷达是 <b>PyQt6 桌面程序</b>，业务逻辑（数据抓取、评论分析、五维机会评分、
+      定价弹性计算、趋势与竞品跟踪）都在本地运行，因此浏览器里没有可直接运行的版本。
+      本页是<b>桌面版的真实界面截图</b>，按左侧导航切换即可浏览全部 9 个功能页。
+      <br><br>
+      完整功能请运行桌面版：<code>选品雷达.exe</code>（Windows，免安装）。
+      离线模式下内置演示数据、不发起任何网络请求。
+    </div>
+  </main>
+</div>
+
+<footer>
+  选品雷达 · XuanPinLeiDa — AI 市场情报平台　|　界面版本 v3（Zen Analytics 风格）
+</footer>
+
+<script>
+  // 页面清单：与桌面版侧边栏一一对应
+  const PAGES = [
+    { key: "overview",  name: "市场总览", ico: "▦", file: "01-overview.jpg",
+      caption: "跨模块 KPI 汇总与一键情报摘要（数据来自各功能页的分析产出）" },
+    { key: "agent",     name: "AI Agent", ico: "◎", file: "02-agent.jpg",
+      caption: "用一句话描述需求，Agent 自动规划并调用工具，整合成市场情报报告" },
+    { key: "dashboard", name: "带数据总览", ico: "▤", file: "03-dashboard.jpg",
+      caption: "跑完分析后的总览：KPI 微图、关键洞察与优化建议均由真实产出填充" },
+    { key: "review",    name: "评论分析", ico: "▨", file: "04-review.jpg",
+      caption: "从评论里抽取痛点、频次与改进建议，输出可执行的产品改良方向" },
+    { key: "competitor", name: "竞品追踪", ico: "◈", file: "05-competitor.jpg",
+      caption: "跟踪竞品的价格、评分与变化，形成竞争格局判断" },
+    { key: "selector",  name: "智能选品", ico: "◉", file: "06-selector.jpg",
+      caption: "五维机会评分：搜索趋势、竞争度、价格空间、评论缺口、评分差距" },
+    { key: "pricing",   name: "定价策略", ico: "↑", file: "07-pricing.jpg",
+      caption: "价格弹性、盈亏分析、竞争定位由算法直算；策略与促销日历由 AI 生成" },
+    { key: "trend",     name: "趋势报告", ico: "◐", file: "08-trend.jpg",
+      caption: "品类趋势、法规与季节性，结合外部信号生成前瞻判断" },
+    { key: "compare",   name: "竞品对比", ico: "◍", file: "09-compare.jpg",
+      caption: "多个 ASIN 横向对比，找出规格/价格/评分上的差异点" },
+    { key: "monitor",   name: "监控中心", ico: "◔", file: "10-monitor.jpg",
+      caption: "追踪价格 / BSR / 评论变化，超过阈值自动生成告警" },
+  ];
+
+  const navEl = document.getElementById("nav");
+  const titleEl = document.getElementById("title");
+  const captionEl = document.getElementById("caption");
+  const shotEl = document.getElementById("shot");
+
+  PAGES.forEach((p, i) => {
+    const btn = document.createElement("button");
+    btn.className = "nav-item" + (i === 0 ? " active" : "");
+    btn.type = "button";
+    btn.innerHTML = `<span class="nav-ico">${p.ico}</span><span class="txt">${p.name}</span>`;
+    btn.addEventListener("click", () => select(i));
+    navEl.appendChild(btn);
+  });
+
+  function select(i) {
+    const p = PAGES[i];
+    document.querySelectorAll(".nav-item").forEach((el, idx) => {
+      el.classList.toggle("active", idx === i);
+    });
+    titleEl.textContent = p.name;
+    captionEl.textContent = p.caption;
+    shotEl.src = "shots/" + p.file;
+    shotEl.alt = p.name + " 界面截图";
+    if (history.replaceState) history.replaceState(null, "", "#" + p.key);
+  }
+
+  // 支持用 #hash 直达某一页
+  const startKey = location.hash.replace("#", "");
+  const startIdx = Math.max(0, PAGES.findIndex(p => p.key === startKey));
+  select(startIdx);
+</script>
+</body>
+</html>
